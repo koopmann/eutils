@@ -1,5 +1,5 @@
 [project]
-name = "eutils"
+name = "biocommons.eutils"
 authors = [
   { name="biocommons contributors", email="biocommons-dev@googlegroups.com" },
 ]
