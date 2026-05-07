@@ -54,7 +54,7 @@ keywords = [
   "variation"
 ]
 license = "Apache-2.0"
-name = "eutils"
+name = "biocommons.eutils"
 readme = "README.md"
 requires-python = ">=3.12"
 
