@@ -1,20 +1,22 @@
 import atexit
-import collections
-import os
 import tempfile
 import time
 import unittest
+from pathlib import Path
 
-from biocommons.eutils._internal.sqlitecache import SQLiteCache
+from eutils._internal.sqlitecache import SQLiteCache
 
 
 class Test_SQLiteCacheBase(unittest.TestCase):
     def setUp(self):
         _, self._fn = tempfile.mkstemp(suffix=".db")
 
-        atexit.register(lambda: os.remove(self._fn))
+        atexit.register(lambda: Path(self._fn).unlink())
 
         self.cache = SQLiteCache(self._fn)
+
+    def tearDown(self):
+        self.cache.close()
 
 
 class Test_SQLiteCache_AttrLookup(Test_SQLiteCacheBase):
@@ -51,14 +53,14 @@ class Test_SQLiteCache_AttrLookup(Test_SQLiteCacheBase):
 
 class Test_SQLiteCache_Dir(Test_SQLiteCacheBase):
     def setUp(self):
-        super(Test_SQLiteCache_Dir, self).setUp()
+        super().setUp()
         self.cache["a"] = "a"
         self.cache["b"] = "b"
         self.cache["b"] = "b2"
         self.cache["c"] = "c"
 
     def test_dir(self):
-        assert set(["a", "b", "c"]) == set(dir(self.cache))
+        assert {"a", "b", "c"} == set(dir(self.cache))
 
     def test_in(self):
         assert "a" in self.cache
@@ -74,10 +76,10 @@ class Test_SQLiteCache_Expire(Test_SQLiteCacheBase):
         self.cache["b"] = "b2"
         self.cache["c"] = "c"
 
-        assert set(["a", "b", "c"]) == set(dir(self.cache))
+        assert {"a", "b", "c"} == set(dir(self.cache))
         self.cache.expire(3)
         # b was updated and should be younger than 3 seconds old
-        assert set(["b", "c"]) == set(dir(self.cache))
+        assert {"b", "c"} == set(dir(self.cache))
 
 
 if __name__ == "__main__":
